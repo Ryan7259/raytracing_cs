@@ -1,4 +1,4 @@
-# Raytracing project in C#
+# Ray Tracing project in C#
 
  A raytracer program in C# I wrote to learn more about 3d graphics and rendering with help from the Ray Tracing In One Weekend and pbrt books.
 
