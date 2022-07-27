@@ -40,10 +40,13 @@ public class BVHNode : Hittable {
         NPrimitives = 0;
     }
 
-    public override bool hit(in Ray r, float t_min, float t_max, ref HitRecord rec)
+    public override bool Hit(in Ray r, float t_min, float t_max, ref HitRecord rec)
     {
         // do AABB test, early out if doesn't intersect
-        if ( !Bounds.hit(r, t_min, t_max) ) return false;
+        if ( !Bounds.Hit(r, t_min, t_max) )
+        { 
+            return false;
+        }
         
         // check if it's a leaf
         if ( Left == null && Right == null )
@@ -55,24 +58,25 @@ public class BVHNode : Hittable {
 
             foreach ( Hittable h in Primitives )
             {
-                if ( h.hit(r, t_min, closest_t_so_far, ref temp_rec) )
+                if ( h.Hit(r, t_min, closest_t_so_far, ref temp_rec) )
                 {
                     // atleast hit 1 object
                     hit_anything = true;
-                    closest_t_so_far = temp_rec.t;
+                    closest_t_so_far = temp_rec.T;
                     rec = temp_rec;
                 }
             }
+
             return hit_anything;
         }
         // not a leaf, test ray againt children
         else
         {
-            bool hit_left = Left != null ? Left.hit(r, t_min, t_max, ref rec) : false;
+            bool hit_left = Left != null ? Left.Hit(r, t_min, t_max, ref rec) : false;
 
             // since hit also updates farthest object to a closer val, 
             // we should set it to a potentially updated tmax from recursing left children
-            bool hit_right = Right != null ? Right.hit(r, t_min, hit_left ? rec.t : t_max, ref rec) : false;
+            bool hit_right = Right != null ? Right.Hit(r, t_min, hit_left ? rec.T : t_max, ref rec) : false;
 
             return hit_left || hit_right;
         }

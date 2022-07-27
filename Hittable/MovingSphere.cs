@@ -19,7 +19,7 @@ public class MovingSphere : Hittable
         Mat = mat;
     }
 
-    public override bool hit(in Ray r, float t_min, float t_max, ref HitRecord rec)
+    public override bool Hit(in Ray r, float t_min, float t_max, ref HitRecord rec)
     {
         // geometric
         Vector3 L = GetCenter(r.Time) - r.Origin;
@@ -42,10 +42,11 @@ public class MovingSphere : Hittable
             }
         }
 
-        rec.p = r.at(root); // record nearest vector intersection point
-        rec.set_face_normal(r, (rec.p - GetCenter(r.Time)) / Radius ); // divide by radius b/c pt of intersection to center is just radius OR .unit_vector() to record outward normal
-        rec.t = root; // record t value to intersection point from ray origin
-        rec.mat = Mat; // set material of hit object
+        rec.P = r.at(root); // record nearest vector intersection point
+        rec.SetFaceNormal(r, (rec.P - GetCenter(r.Time)) / Radius ); // divide by radius b/c pt of intersection to center is just radius OR .unit_vector() to record outward normal
+        rec.T = root; // record t value to intersection point from ray origin
+        rec.Mat = Mat; // set material of hit object
+        (rec.U, rec.V) = GetSphereUV(rec.Normal); // get uv coordinates of point on sphere
 
         return true;
     }
@@ -69,5 +70,16 @@ public class MovingSphere : Hittable
         );
 
         return AABB.Union(box_t0, box_t1);
+    }
+
+    public (float, float) GetSphereUV(Vector3 p)
+    {
+        float phi = (float)(Math.Atan2(p.Z, p.X) + Math.PI);
+        float theta = (float)Math.Acos(p.Y);
+
+        float u = phi / (2f*(float)Math.PI);
+        float v = theta / (float)Math.PI;
+
+        return (u, v);
     }
 }

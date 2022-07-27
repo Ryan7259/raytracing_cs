@@ -12,11 +12,11 @@ public abstract class Hittable {
         but we have to stop early if angles or distances
         are not within sphere
     */
-    public abstract bool hit(in Ray r, float t_min, float t_max, ref HitRecord rec);
+    public abstract bool Hit(in Ray r, float t_min, float t_max, ref HitRecord rec);
 
     /*
         create a bounding box for AABB
         returns a bool for cases where AABB is not possible like infinite planes
     */
-    public abstract AABB WorldBound(float time0 = 0.0f, float time1 = 0.0f);
+    public abstract AABB WorldBound(float time0 = 0.0f, float time1 = 1.0f);
 }

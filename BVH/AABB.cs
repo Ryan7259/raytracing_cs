@@ -1,6 +1,6 @@
 using System.Numerics;
 
-public class AABB 
+public class AABB
 {
     public Vector3 Minimum { get; set; }
     public Vector3 Maximum { get; set; }
@@ -45,7 +45,7 @@ public class AABB
         }
     }
 
-    public bool hit(in Ray r, float tmin, float tmax)
+    public bool Hit(in Ray r, float tmin, float tmax)
     {
         // solve for t with ray r for 1 axis
         Vector3 t0s = (Minimum - r.Origin) * r.InvDirs;

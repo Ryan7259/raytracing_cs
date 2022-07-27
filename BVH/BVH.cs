@@ -59,7 +59,7 @@ public class BVH {
             // select bins to span longest axis
             int dim = centroidBounds.MaximumExtent();
             
-            int mid = (start + end) / 2;
+            int mid = (start + end + 1) / 2;
             // case where there's no volume, maybe an infinite plane? so return a leaf
             if ( centroidBounds.Maximum[dim] == centroidBounds.Minimum[dim] )
             {
@@ -79,7 +79,6 @@ public class BVH {
                 if ( nPrimitives < 5 )
                 {
                     Console.Error.WriteLine("nPrimitives < 5, leafing: " + start + "-" + end);
-
                     List<Hittable> leafPrimitives = new List<Hittable>(nPrimitives);
                     for ( int i = start; i <= end; ++i )
                     {
@@ -87,13 +86,11 @@ public class BVH {
                     }
                     node.InitLeaf(nPrimitives, bounds, leafPrimitives);
                     return node;
-                    /*
-                    // instead, split primitives equally
+                    /* instead, split primitives equally
                     Console.Error.WriteLine($"start: {start}, end: {end}, mid: {mid}");
-                    Util.nth_element(ref primitiveInfo, start, end, mid, Comparer<BVHPrimitiveInfo>.Create((a, b) => {
+                    Util.NthElement(ref primitiveInfo, start, end, mid, Comparer<BVHPrimitiveInfo>.Create((a, b) => {
                         return a.Centroid[dim].CompareTo(b.Centroid[dim]);
-                    }));
-                    */
+                    }));*/
                 }
                 else
                 {
@@ -108,7 +105,7 @@ public class BVH {
                     }
 
                     // project every primitive in curr section into each bucket along longest axis
-                    for (int i = start; i <= end; ++i) 
+                    for ( int i = start; i <= end; ++i ) 
                     {
                         int b = (int)(nBuckets * (1.0f/(centroidBounds.Maximum[dim]-centroidBounds.Minimum[dim])) 
                             * (primitiveInfo[i].Centroid[dim]-centroidBounds.Minimum[dim]));
@@ -121,7 +118,8 @@ public class BVH {
 
                     // calculate cost of every bucket partition choice
                     float[] cost = new float[nBuckets - 1];
-                    for (int i = 0; i < nBuckets - 1; ++i) 
+
+                    for ( int i = 0; i < nBuckets - 1; ++i ) 
                     {
                         AABB b0 = new AABB();
                         AABB b1 = new AABB();
@@ -143,14 +141,15 @@ public class BVH {
                     // find the min cost bucket to split at
                     float minCost = cost[0];
                     int minCostSplitBucket = 0;
-                    for (int i = 1; i < nBuckets - 1; ++i) {
+                    for ( int i = 1; i < nBuckets - 1; ++i ) 
+                    {
                         if (cost[i] < minCost) {
                             minCost = cost[i];
                             minCostSplitBucket = i;
                         }
                     }
-                   // Console.Error.WriteLine("minCost: " + minCost + ", splitBucket " + minCostSplitBucket);
-
+                    
+                    Console.Error.WriteLine("minCost: " + minCost + ", splitBucket " + minCostSplitBucket);
 
                     // Either create leaf or split primitives at selected SAH bucket
                     // we set cost of intersection to be 1, so it == to number of prims
@@ -170,7 +169,6 @@ public class BVH {
                             return b <= minCostSplitBucket;
                         }); 
                         
-                        /*
                         Console.Error.Write("mid: " + mid + ", [");
                         for ( int i = start; i <= end; ++i )
                         {
@@ -183,7 +181,6 @@ public class BVH {
                             Console.Error.Write(b + ", ");
                         }
                         Console.Error.WriteLine("]\n");
-                        */
                     } 
                     // cheaper to just create a leaf node
                     else 

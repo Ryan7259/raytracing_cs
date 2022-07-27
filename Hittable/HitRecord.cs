@@ -1,31 +1,29 @@
 using System.Numerics;
 
 public class HitRecord {
-    public Vector3 p { get; set; }
-    public Vector3 normal { get; set; }
-    public float t { get; set; }
-    public bool front_face { get; set; } // if ray hit object from outside
-    public Material? mat { get; set; }
+    public Vector3 P { get; set; }
+    public Vector3 Normal { get; set; }
+    public float T { get; set; }
+    public bool FrontFace { get; set; } // if ray hit object from outside
+    public Material Mat { get; set; }
+    public float U { get; set; }
+    public float V { get; set; }
 
     public HitRecord()
     {
-        p = new Vector3(0.0f);
-        normal = new Vector3(0.0f);
-        t = 0.0f;
-        front_face = false;
-        mat = null;
+        Mat = new Lambertian(new Vector3());
     }
 
     // always have normal against the ray if it intersects, so we need to track if 
     // normal is pointing inside or outside surface
-    public void set_face_normal(in Ray r, in Vector3 outward_normal)
+    public void SetFaceNormal(in Ray r, in Vector3 outwardNormal)
     {
         // ray is inside object since its intersection point normal is going with it
         // or the dot is positive
         
         // ray is outside since its intersection point is against the normal
         // or the dot is negative
-        front_face = Vector3.Dot(outward_normal, r.Dir) < 0.0f;
-        normal = front_face ? outward_normal : -outward_normal;
+        FrontFace = Vector3.Dot(outwardNormal, r.Dir) < 0.0f;
+        Normal = FrontFace ? outwardNormal : -outwardNormal;
     }
 }

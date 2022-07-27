@@ -7,9 +7,9 @@ public class Sphere : Hittable {
 
     public Sphere() 
     {
-        Radius = 0.0f;
-        Center = new Vector3(0.0f);
-        Mat = new Lambertian(new Vector3(0.0f));
+        Radius = 0f;
+        Center = new Vector3();
+        Mat = new Lambertian(new Vector3());
     }
     public Sphere(Vector3 center, float radius, Material mat)
     {
@@ -18,12 +18,12 @@ public class Sphere : Hittable {
         Mat = mat;
     }
 
-    public override bool hit(in Ray r, float t_min, float t_max, ref HitRecord rec)
+    public override bool Hit(in Ray r, float t_min, float t_max, ref HitRecord rec)
     {
         // geometric
         Vector3 L = Center - r.Origin;
         float tc = Vector3.Dot(L, r.Dir);
-        if ( tc < 0.0 ) return false; // ray is not in same direction
+        if ( tc < 0 ) return false; // ray is not in same direction
 
         float d2 = L.LengthSquared() - tc*tc;
         float radius2 = Radius*Radius;
@@ -31,7 +31,6 @@ public class Sphere : Hittable {
 
         float x = (float)Math.Sqrt(radius2 - d2);
 
-        //Console.Error.WriteLine("t_min: " + t_min + ", t_max: " + t_max);
         float root = tc - x;
         if ( root < t_min || root > t_max)
         {
@@ -42,10 +41,11 @@ public class Sphere : Hittable {
             }
         }
 
-        rec.p = r.at(root); // record nearest vector intersection point
-        rec.set_face_normal(r, (rec.p - Center) / Radius ); // divide by radius b/c pt of intersection to center is just radius OR .unit_vector() to record outward normal
-        rec.t = root; // record t value to intersection point from ray origin
-        rec.mat = Mat; // set material of hit object
+        rec.P = r.at(root); // record nearest vector intersection point
+        rec.SetFaceNormal(r, (rec.P - Center) / Radius ); // divide by radius b/c pt of intersection to center is just radius OR .unit_vector() to record outward normal
+        rec.T = root; // record t value to intersection point from ray origin
+        rec.Mat = Mat; // set material of hit object
+        (rec.U, rec.V) = GetSphereUV(rec.Normal); // get uv coordinates of point on sphere
 
         return true;
         /*
@@ -73,7 +73,7 @@ public class Sphere : Hittable {
         rec.p = r.at(root);
         rec.set_face_normal(r, (rec.p - Center) / Radius);
         rec.t = root;
-        rec.mat = Mat;
+        rec.Mat = Mat;
         
         return true;
         */
@@ -85,5 +85,16 @@ public class Sphere : Hittable {
             Center - new Vector3(Radius, Radius, Radius), 
             Center + new Vector3(Radius, Radius, Radius)
         );
+    }
+
+    public (float, float) GetSphereUV(Vector3 p)
+    {
+        float phi = (float)(Math.Atan2(p.Z, p.X) + Math.PI);
+        float theta = (float)Math.Acos(p.Y);
+
+        float u = phi / (2f*(float)Math.PI);
+        float v = theta / (float)Math.PI;
+
+        return (u, v);
     }
 }

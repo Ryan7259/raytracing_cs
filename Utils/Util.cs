@@ -48,14 +48,14 @@ public class Util
         }
     }
 
-    /*
-    public static BVHPrimitiveInfo Nth_Element(ref List<BVHPrimitiveInfo> list, int start, int end, int n, Comparer<BVHPrimitiveInfo> comparer)
+    public static BVHPrimitiveInfo NthElement(ref List<BVHPrimitiveInfo> list, int start, int end, int n, Comparer<BVHPrimitiveInfo> comparer)
     {
         if ( start == end ) return list[start];
 
         // select end as pivot
         // partition all elems so that they are sorted like so [elems <= pivot < elems]
-        int pivot = partition(ref list, start, end, comparer);
+        int pivot = PartitionC(ref list, start, end, comparer);
+        Console.Error.WriteLine("pivot: " + pivot);
 
         // pivot is now sorted, check if its the nth element
         if ( n == pivot )
@@ -65,15 +65,14 @@ public class Util
         // pivot > nth element, partition lower half
         else if ( n < pivot )
         {
-            return nth_element(ref list, start, pivot-1, n, comparer);
+            return NthElement(ref list, start, pivot-1, n, comparer);
         }
         // pivot < nth element, partition upper half
         else
         {
-            return nth_element(ref list, pivot+1, end, n, comparer);
+            return NthElement(ref list, pivot+1, end, n, comparer);
         }
     }
-    */
 
     /*
         used to partition a range of a primitiveInfo list into two havles
@@ -81,6 +80,27 @@ public class Util
         
         ordering: [ evals true < returned idx <= evals false]
     */
+    public static int PartitionC(ref List<BVHPrimitiveInfo> list, int start, int end, Comparer<BVHPrimitiveInfo> c)
+    {   
+        // select end as pivot, so stop testing right before pivot
+        // build up < list on left, starting with i as end of new list, j to test elems
+        // add to end of new list when j <= pivot
+        int i = start;
+
+        for ( int j = start; j < end; ++j )
+        {   
+            // swap when l elem < pivot elem
+            if ( c.Compare(list[j], list[end]) <= 0 )
+            {
+                (list[i], list[j]) = (list[j], list[i]);
+                ++i;
+            }
+        }
+        // i should now be 1 off end of list, swap with pivot, so i is now sorted
+        (list[i], list[end]) = (list[end], list[i]);
+        return i;
+    }
+
     public static int Partition(ref List<BVHPrimitiveInfo> list, int start, int end, Predicate<BVHPrimitiveInfo> p)
     {   
         // select end as pivot, so stop testing right before pivot
